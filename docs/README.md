@@ -1,0 +1,69 @@
+## iGTTS(Gemini TTS)
+iGTTS 是通过调用 Gemini TTS 的接口，实现文本转语音（TTS）的命令行工具。
+
+### 添加 API key
+```bash
+# 编辑 .zshrc：
+vim ~/.zshrc
+# 添加信息（导入环境变量）：
+export GEMINI_API_KEY=<YOUR_API_KEY_HERE>
+# 保存后应用更改：
+source ~/.zshrc
+```
+
+### 运行 iGTTS
+```bash
+./igtts -h
+usage: igtts [-h] [-i INPUT_FILE] [-l] [-v VOICE] [-o OUTPUT_FILE] [text]
+
+Gemini TTS 文本转语音（TTS）命令行工具。
+
+positional arguments:
+  text                  指定语音文本的内容。如果未提供，请使用 --input-file。
+
+options:
+  -h, --help            show this help message and exit
+  -i, --input-file INPUT_FILE
+                        指定语音文本的文件。
+  -l, --list-voices     列出语音的语音名称。
+  -v, --voice VOICE     指定语音的语音名称（默认：Zephyr）。
+  -o, --output-file OUTPUT_FILE
+                        指定音频保存的文件（默认：output.wav）。
+```
+
+### 实例
+```bash
+# 指定语音文本的内容
+./igtts "Hello, my name is iChochy."
+# 指定语音文本的文件 -i "input.txt"
+./igtts -i "input.txt"
+# 指定语音文本的文件 -i "input.txt"
+# 指定语音保存的文件 -o "output.wav"
+./igtts -i "input.txt" -o "output.mp3"
+# 指定语音文本的文件 -i "input.txt"
+# 指定语音的语音名称 -v "Zephyr"
+# 指定音频保存的文件 -o "output.wav"
+./igtts -i "input.txt" -v "Zephyr" -o "output.mp3"
+# 列出语音的语音名称 -l
+./igtts -l
+```
+
+## 模型
+**gemini-2.5-flash-preview-tts**  
+
+## 获取 API key
+API key：[https://aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+
+### 参数说明：
+每分钟请求数 (RPM)  
+每分钟 token 数（输入）(TPM)  
+每日请求数 (RPD)  
+
+### 免费额度：
+RPM：3	  
+TPM：10000	  
+RPD：15  
+
+额度详情：[https://ai.google.dev/gemini-api/docs/rate-limits?hl=zh-cn](https://ai.google.dev/gemini-api/docs/rate-limits?hl=zh-cn)
+
+接口详情：[https://ai.google.dev/gemini-api/docs/speech-generation?hl=zh-cn](https://ai.google.dev/gemini-api/docs/speech-generation?hl=zh-cn)
