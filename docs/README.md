@@ -67,3 +67,9 @@ RPD：15
 额度详情：[https://ai.google.dev/gemini-api/docs/rate-limits?hl=zh-cn](https://ai.google.dev/gemini-api/docs/rate-limits?hl=zh-cn)
 
 接口详情：[https://ai.google.dev/gemini-api/docs/speech-generation?hl=zh-cn](https://ai.google.dev/gemini-api/docs/speech-generation?hl=zh-cn)
+
+## 下载（macOS）
+[https://file.ichochy.com/igtts.zip](https://file.ichochy.com/igtts.zip)
+
+## 音频预览
+[audio.wav](https://file.ichochy.com/audio.wav)
