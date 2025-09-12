@@ -1,2 +1,1 @@
-Hello，My name is iChochy.
-你好，我的名字叫iChochy。
+Hello，这是一个 Gemini TTS CLI 工具，记得关注哦。

@@ -13,10 +13,14 @@ export GEMINI_API_KEY=<YOUR_API_KEY_HERE>
 # 保存后应用更改：
 source ~/.zshrc
 ```
+### 安装 iGTTS
+```bash
+pip install igtts
+```
 
 ### 运行 iGTTS
 ```bash
-./igtts -h
+igtts -h
 usage: igtts [-h] [-i INPUT_FILE] [-l] [-v VOICE] [-o OUTPUT_FILE] [text]
 
 Gemini TTS 文本转语音（TTS）命令行工具。
@@ -37,22 +41,22 @@ options:
 ### 实例
 ```bash
 # 指定语音文本的内容
-./igtts "Hello, my name is iChochy."
+igtts "Hello, my name is iChochy."
 
 # 指定语音文本的文件 -i "input.txt"
-./igtts -i "input.txt"
+igtts -i "input.txt"
 
 # 指定语音文本的文件 -i "input.txt"
 # 指定语音保存的文件 -o "output.wav"
-./igtts -i "input.txt" -o "output.mp3"
+igtts -i "input.txt" -o "output.mp3"
 
 # 指定语音文本的文件 -i "input.txt"
 # 指定语音的语音名称 -v "Zephyr"
 # 指定音频保存的文件 -o "output.wav"
-./igtts -i "input.txt" -v "Zephyr" -o "output.mp3"
+igtts -i "input.txt" -v "Zephyr" -o "output.mp3"
 
 # 列出语音的语音名称 -l
-./igtts -l
+igtts -l
 ```
 
 ### 模型
@@ -78,14 +82,17 @@ RPD：15
 
 ## 软件信息
 
-### GitHub 
-[https://github.com/ichochy/igtts](https://github.com/ichochy/igtts)
-
 ### 网站
 [https://tts.ichochy.com](https://tts.ichochy.com)
 
-### 音频预览
-[audio.wav](https://file.ichochy.com/audio.wav)
+### GitHub 
+[https://github.com/ichochy/igtts](https://github.com/ichochy/igtts)
 
-### 下载（macOS）
-[https://file.ichochy.com/igtts.zip](https://file.ichochy.com/igtts.zip)
+### PYPI
+[https://pypi.org/project/igtts](https://pypi.org/project/igtts/)
+
+
+### 音频预览
+Default:[audio.wav](https://file.ichochy.com/audio.wav)  
+GitHub:[audio.wav](https://raw.githubusercontent.com/iChochy/iGTTS/refs/heads/main/output.wav)
+
