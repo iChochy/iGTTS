@@ -1,11 +1,12 @@
 import argparse
 import os
 import wave
-
 from google import genai
 from google.genai import types
 
-# 定义常量以提高代码可读性和可维护性
+# =====================
+# 常量定义
+# =====================
 GEMINI_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 DEFAULT_VOICE = "Zephyr"
 DEFAULT_INPUT_FILE = "input.txt"
@@ -14,32 +15,43 @@ WAV_CHANNELS = 1
 WAV_RATE = 24000
 WAV_SAMPLE_WIDTH = 2
 
+AVAILABLE_VOICES = [
+    "Zephyr", "Puck", "Erinome", "Kore", "Gacrux", "Autonoe", "Iapetus"
+]
 
-def save_as_wav_file(filename: str, pcm_data: bytes):
-    """
-    将 PCM 数据保存为 WAV 文件。
-    """
+
+# =====================
+# 工具函数
+# =====================
+def save_as_wav(filename: str, pcm_data: bytes):
+    """保存 PCM 数据为 WAV 文件。"""
     try:
         with wave.open(filename, "wb") as wf:
             wf.setnchannels(WAV_CHANNELS)
             wf.setsampwidth(WAV_SAMPLE_WIDTH)
             wf.setframerate(WAV_RATE)
             wf.writeframes(pcm_data)
-        print(f"音频已成功保存到 '{filename}'")
+        print(f"✅ 音频已保存到：{filename}")
     except Exception as e:
-        print(f"错误：保存 WAV 文件失败 - {e}")
+        print(f"❌ 保存 WAV 文件失败：{e}")
 
 
-def gemini_tts(text: str, voice: str, file_name: str):
-    """
-    使用 Gemini TTS 模型将文本转换为语音并保存为 WAV 文件。
+def read_text(source_text: str | None, file_path: str) -> str:
+    """优先使用命令行文本，否则从文件读取。"""
+    if source_text:
+        return source_text.strip()
 
-    Args:
-        text: 要转换成音频的文本字符串。
-        voice: 语音名称 (例如: 'Kore')。
-        file_name: 保存音频文件的文件名 (例如: 'output.wav')。
-    """
-    print("开始生成音频...")
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"找不到输入文件：{file_path}")
+
+    with open(file_path, encoding="utf-8") as f:
+        return f.read().strip()
+
+
+def gemini_tts(text: str, voice: str, output_path: str):
+    """调用 Gemini 模型生成语音并保存。"""
+    print("🎤 正在生成语音，请稍候…")
+
     client = genai.Client()
     try:
         response = client.models.generate_content(
@@ -49,66 +61,61 @@ def gemini_tts(text: str, voice: str, file_name: str):
                 response_modalities=["AUDIO"],
                 speech_config=types.SpeechConfig(
                     voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=voice,
-                        )
+                        prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)
                     )
                 ),
-            )
+            ),
         )
-        # 检查响应中是否有音频数据
-        if response.candidates and response.candidates[0].content.parts and \
-                response.candidates[0].content.parts[0].inline_data:
-            pcm_data = response.candidates[0].content.parts[0].inline_data.data
-            save_as_wav_file(file_name, pcm_data)
-        else:
-            print("错误：Gemini API 响应中没有找到音频数据。")
-            print("响应详情：", response)
+
+        part = (
+            response.candidates[0]
+            .content.parts[0]
+            .inline_data
+            if response.candidates
+            else None
+        )
+
+        if not part or not part.data:
+            raise ValueError("Gemini API 未返回有效音频数据")
+
+        save_as_wav(output_path, part.data)
+
     except Exception as e:
-        print(f"错误：Gemini API 调用失败 - {e}")
+        print(f"❌ 生成语音失败：{e}")
 
 
+# =====================
+# 主程序入口
+# =====================
 def main():
-    parser = argparse.ArgumentParser(description="Gemini 文本转语音（TTS）命令行工具。")
-    parser.add_argument("text", nargs="?", help="指定语音文本的内容。如果未提供，请使用 --input-file。")
-    parser.add_argument("-i", "--input-file", default=DEFAULT_INPUT_FILE, help="指定语音文本的文件。")
-    parser.add_argument("-l", "--list-voices", action="store_true", help="列出语音的语音名称。")
-    parser.add_argument("-v", "--voice", default=DEFAULT_VOICE, help=f"指定语音的语音名称（默认：{DEFAULT_VOICE}）。")
-    parser.add_argument("-o", "--output-file", default=DEFAULT_OUTPUT_FILE,
-                        help=f"指定音频保存的文件（默认：{DEFAULT_OUTPUT_FILE}）。")
+    parser = argparse.ArgumentParser(description="Gemini 文本转语音（TTS）工具")
+    parser.add_argument("text", nargs="?", help="要朗读的文本（可选）")
+    parser.add_argument("-i", "--input-file", default=DEFAULT_INPUT_FILE, help="指定输入文本文件")
+    parser.add_argument("-o", "--output-file", default=DEFAULT_OUTPUT_FILE, help="指定输出音频文件名")
+    parser.add_argument("-v", "--voice", default=DEFAULT_VOICE, help=f"语音名称（默认：{DEFAULT_VOICE}）")
+    parser.add_argument("-l", "--list-voices", action="store_true", help="列出可用语音名称")
 
     args = parser.parse_args()
 
     if args.list_voices:
-        voices = ["Zephyr", "Puck", "Erinome", "Kore", "Gacrux", "Autonoe", "Iapetus"]
-        print("语音名称的列表:")
-        for voice in voices:
-            print(voice)
-        print("……")
+        print("🎙️ 可用语音名称：")
+        for v in AVAILABLE_VOICES:
+            print(" -", v)
         return
 
-    # 处理输入文本
-    text_to_speak = ""
-    if args.text:
-        text_to_speak = args.text
-    elif args.input_file:
-        if not os.path.exists(args.input_file):
-            print(f"错误：找不到文件 '{args.input_file}'")
-            return
-        try:
-            with open(args.input_file, 'r', encoding='utf-8') as f:
-                text_to_speak = f.read()
-        except IOError as e:
-            print(f"错误：读取文件 '{args.input_file}' 失败 - {e}")
-            return
+    try:
+        text = read_text(args.text, args.input_file)
+        if not text:
+            raise ValueError("输入文本为空")
 
-    if not text_to_speak.strip():
-        print("错误：没有要朗读的文本。")
-        return
+        print(f"📖 文本预览：{text[:50]}{'...' if len(text) > 50 else ''}")
+        print(f"🗣️ 使用语音：{args.voice}")
 
-    print(f"语音内容: {text_to_speak[:30]}{'...' if len(text_to_speak) > 30 else ''}")
-    print(f"语音名称: {args.voice}")
-    gemini_tts(text_to_speak, args.voice, args.output_file)
+        gemini_tts(text, args.voice, args.output_file)
+
+    except Exception as e:
+        print(f"❌ 错误：{e}")
+
 
 if __name__ == "__main__":
     main()

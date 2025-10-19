@@ -1,19 +1,25 @@
 [project]
-name = "igtts"
-version = "0.1.1"
+name = "iGTTS"
+version = "0.1.2"
 description = "Gemini TTS CLI"
 authors = [
     {name = "iChochy",email = "me@ichochy.com"}
 ]
 readme = "docs/README.md"
+keywords = ["TTS", "Gemini"]
 license = {text = "MIT"}
+include = ["LICENSE"]
 requires-python = ">=3.13"
+
 dependencies = [
     "google-genai (>=1.36.0,<2.0.0)"
 ]
 
 [project.scripts]
 igtts = "igtts:main"
+
+[project.urls]
+Homepage = "https://tts.ichochy.com"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
